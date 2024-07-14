@@ -1,0 +1,73 @@
+# Load libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Load dataset
+myirisdataset_path <- read.csv('/content/sample_data/IRIS.csv')
+
+# View first 8 rows
+head(myirisdataset_path, 8)
+
+# View last 5 rows
+tail(myirisdataset_path, 5)
+
+# Summary of dataset
+str(myirisdataset_path)
+
+# Summary statistics
+summary(myirisdataset_path)
+
+# Check for missing values
+print(paste("MISSING VALUES IN THE IRIS DATASET =", sum(is.na(myirisdataset_path))))
+
+# Drop duplicates
+myiris_dataset <- myirisdataset_path[!duplicated(myirisdataset_path), ]
+
+# Boxplot
+ggplot(myirisdataset_path, aes(x = species, y = Sepal.Length, fill = species)) +
+  geom_boxplot() +
+  labs(title = 'Boxplot for EDA using Iris Dataset')
+
+# Histogram
+myirisdataset_path %>%
+  gather(key = "variable", value = "value", -species) %>%
+  ggplot(aes(x = value, fill = species)) +
+  geom_histogram(binwidth = 0.5, position = "identity") +
+  facet_wrap(~variable, scales = "free") +
+  labs(title = 'Histogram Representation')
+
+# Scatter plot matrix
+ggplot(myirisdataset_path, aes(x = Sepal.Length, y = Sepal.Width, color = species)) +
+  geom_point() +
+  facet_grid(. ~ species) +
+  labs(title = 'Representation of Iris Features Using Scatter Plot')
+
+# Violin plot
+ggplot(myirisdataset_path, aes(x = species, y = Sepal.Length, fill = species)) +
+  geom_violin() +
+  labs(title = 'Representation of Iris Dataset using Violin Plot') +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+# Label encoding (if needed)
+myirisdataset_path$Encoded_Species <- as.integer(factor(myirisdataset_path$species))
+
+# Correlation heatmap
+cor_data <- myirisdataset_path %>%
+  select(-c(species, Encoded_Species)) %>%
+  cor()
+
+ggplot(data = as.data.frame(cor_data), aes(x = Var1, y = Var2, fill = corr)) +
+  geom_tile() +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(title = 'Correlation Heatmap Representing Iris Features', x = "", y = "")
+
+# Class distribution plot
+ggplot(myirisdataset_path, aes(x = species, fill = species)) +
+  geom_bar() +
+  labs(title = 'Representation of class distribution for iris species')
+
+# Display class distribution
+CLASS_DIST <- table(myirisdataset_path$species)
+print("CLASS REPRESENTATION FOR SPECIES OF IRIS FLOWER")
+print(CLASS_DIST)
